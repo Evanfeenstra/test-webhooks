@@ -90,7 +90,7 @@ export function process(event: WebhookEvent) {
           }
         }
       } else {
-        // "push" has no "action"
+        // "push" has no "action" //
         msg = pushAction(event as PushEvent);
       }
     }
