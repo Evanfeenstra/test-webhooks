@@ -1,6 +1,7 @@
 const express = require("express");
 import * as hmac from "./hmac";
 import { SECRET } from "./consts";
+import { process } from "./webhooks";
 
 const app = express();
 const port = 8000;
@@ -17,8 +18,12 @@ app.get("/", (req, res) => {
   console.log("yo");
   res.send("Hello World!");
 });
+app.post("/", (req, res) => {
+  console.log("yo POST");
+  res.send("Hello World!");
+});
 
-app.get("/webhook", (req, res) => {
+app.post("/webhook", (req, res) => {
   console.log("=> webhook");
   const sig = req.headers["x-hub-signature-256"];
   if (!sig) return unauthorized(res);
@@ -26,6 +31,7 @@ app.get("/webhook", (req, res) => {
   const valid = hmac.verifyHmac(sig, req.rawBody, SECRET);
   console.log("VALID!!!!", valid);
   console.log(req.body);
+  process(req.body);
 });
 
 function unauthorized(res) {

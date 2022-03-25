@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Evanfeenstra/test-webhooks#readme",
   "dependencies": {
+    "@octokit/webhooks-types": "^5.2.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "octokit": "^1.7.1"
