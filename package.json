@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "serve": "npx ts-node server",
     "start": "npx ts-node index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,6 +20,10 @@
   "homepage": "https://github.com/Evanfeenstra/test-webhooks#readme",
   "dependencies": {
     "dotenv": "^16.0.0",
+    "express": "^4.17.3",
     "octokit": "^1.7.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node14": "^1.0.1"
   }
 }
