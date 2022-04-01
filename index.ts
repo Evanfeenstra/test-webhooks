@@ -8,7 +8,7 @@ function octo(): Octokit {
   const octokit = new Octokit({ auth: pat });
   return octokit;
 }
-
+//
 async function go() {
   // try {
   console.log("yo", OWNER, REPO);
