@@ -4,6 +4,11 @@ import {
   IssuesClosedEvent,
   IssuesReopenedEvent,
   PushEvent,
+  CreateEvent,
+  DeleteEvent,
+  PullRequestClosedEvent,
+  PullRequestOpenedEvent,
+  ReleaseReleasedEvent,
 } from "@octokit/webhooks-types";
 
 // https://localtunnel.github.io/www/
@@ -66,6 +71,19 @@ const issueActionMap: ActionMap = {
     return `Issue #${e.issue.number} reopened in ${e.repository.full_name}`;
   },
 };
+const prActionMap: ActionMap = {
+  opened: (e: PullRequestOpenedEvent) => {
+    return `New Pull Request opened in ${e.repository.full_name}: ${e.pull_request.title}`;
+  },
+  closed: (e: PullRequestClosedEvent) => {
+    return `Pull Request ${e.pull_request.number} in ${e.repository.full_name} closed`;
+  },
+};
+const releaseActions: ActionMap = {
+  released: (e: ReleaseReleasedEvent) => {
+    return `New Release in ${e.repository.full_name}! ${e.release.tag_name}`;
+  },
+};
 function pushAction(e: PushEvent): string {
   if (e.head_commit) {
     return `New commit in ${e.repository.full_name} by ${e.pusher.name}: ${e.head_commit.message}`;
@@ -73,27 +91,41 @@ function pushAction(e: PushEvent): string {
     return "";
   }
 }
-const actionsMap: { [k: string]: ActionMap } = {
+function createAction(e: CreateEvent | DeleteEvent): string {
+  if (e.ref_type === "branch") {
+    return `New branch created in ${e.repository.full_name}`;
+  } else if (e.ref_type === "tag") {
+    return `New tag created in ${e.repository.full_name}`;
+  } else {
+    return "";
+  }
+}
+const actionsMap: { [k in PropName]: ActionMap } = {
   issue: issueActionMap,
+  pull_request: prActionMap,
+  release: releaseActions,
 };
 
-const props: string[] = ["issue", "head_commit"];
+// head_commit is for "push"
+// "ref_type" = branch or tag. for "create"
+type PropName = "issue" | "pull_request" | "release";
+
+const props: PropName[] = ["issue", "pull_request", "release"];
 export function process(event: WebhookEvent) {
-  let msg = "";
+  if ("head_commit" in event) {
+    return pushAction(event);
+  } else if ("ref_type" in event) {
+    return createAction(event);
+  }
   for (const prop of props) {
     if (prop in event) {
       if ("action" in event) {
         if (actionsMap[prop]) {
           if (actionsMap[prop][event.action]) {
-            msg = actionsMap[prop][event.action](event);
-            break;
+            return actionsMap[prop][event.action](event);
           }
         }
-      } else {
-        // "push" has no "action" //
-        msg = pushAction(event as PushEvent);
       }
     }
   }
-  if (msg) console.log(msg);
 }

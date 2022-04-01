@@ -19,7 +19,8 @@ async function go() {
   });
   console.log("===>", list);
   if (list.data.length) {
-    return console.log("already exists!");
+    const existing = list.data.find((d) => d.config.url === URL);
+    if (existing) return console.log("already exists!");
   }
   await octokit.request("POST /repos/{owner}/{repo}/hooks", {
     owner: OWNER,

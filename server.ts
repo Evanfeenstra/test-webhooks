@@ -31,7 +31,8 @@ app.post("/webhook", (req, res) => {
   const valid = hmac.verifyHmac(sig, req.rawBody, SECRET);
   console.log("VALID!!!!", valid);
   console.log(req.body);
-  process(req.body);
+  const msg = process(req.body);
+  if (msg) console.log("=====>", msg);
 });
 
 function unauthorized(res) {
