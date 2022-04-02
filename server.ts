@@ -25,10 +25,10 @@ app.post("/", (req, res) => {
 
 app.post("/webhook", (req, res) => {
   console.log("=> webhook");
-  // const sig = req.headers["x-hub-signature-256"];
-  // if (!sig) return unauthorized(res);
-  // const valid = hmac.verifyHmac(sig, req.rawBody, SECRET);
-  // console.log("VALID!!!!", valid);
+  const sig = req.headers["x-hub-signature-256"];
+  if (!sig) return unauthorized(res);
+  const valid = hmac.verifyHmac(sig, req.rawBody, SECRET);
+  console.log("VALID!!!!", valid);
   console.log(req.body);
   const msg = process(req.body);
   if (msg) console.log("=====>", msg);
