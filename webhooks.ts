@@ -86,7 +86,20 @@ const releaseActions: ActionMap = {
 };
 function pushAction(e: PushEvent): string {
   if (e.head_commit) {
-    return `New commit in ${e.repository.full_name} by ${e.pusher.name}: ${e.head_commit.message}`;
+    let refArray = e.ref.split("/");
+    let branch = refArray[refArray.length - 1];
+    let label = "branch";
+    if (refArray.length > 2) {
+      const headsOrTags = refArray[refArray.length - 2];
+      const labels = {
+        heads: "branch",
+        tags: "tag",
+      };
+      if (labels[headsOrTags]) {
+        label = labels[headsOrTags];
+      }
+    }
+    return `New commit in ${e.repository.full_name} (${branch} branch) by ${e.pusher.name}: ${e.head_commit.message}`;
   } else {
     return "";
   }
